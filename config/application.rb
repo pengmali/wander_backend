@@ -36,7 +36,7 @@ module WanderBackend
     # config.time_zone = "Central Time (US & Canada)"
 
     # ✅ Add eager load paths INSIDE the class block
-    config.eager_load_paths << Rails.root.join('app/models')
+    config.eager_load_paths << Rails.root.join("app/models")
 
     # Only loads a smaller set of middleware suitable for API only apps.
     # Middleware like session, flash, cookies can be added back manually.

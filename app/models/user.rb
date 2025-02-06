@@ -1,4 +1,4 @@
-require 'active_record'  # ✅ Ensure ActiveRecord is loaded
+require "active_record"  # ✅ Ensure ActiveRecord is loaded
 
 class User < ApplicationRecord
   has_secure_password  # ✅ Enables bcrypt password hashing
@@ -6,12 +6,12 @@ class User < ApplicationRecord
   has_many :trips, dependent: :destroy
 
   # ✅ Fix ENUM for Rails 8 - Use `as: :integer`
-  enum :travel_style, { 
-    not_specified: 0, 
-    solo: 1, 
-    hikers: 2, 
-    family_trip: 3, 
-    business_trip: 4, 
+  enum :travel_style, {
+    not_specified: 0,
+    solo: 1,
+    hikers: 2,
+    family_trip: 3,
+    business_trip: 4,
     budget_traveler: 5,
     luxury: 6,
     backpacking: 7,
