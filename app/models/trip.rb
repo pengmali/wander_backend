@@ -26,9 +26,9 @@ class Trip < ApplicationRecord
   private
 
   def set_defaults
-    self.start_date ||= Date.today  
-    self.trip_length ||= 7  
-    self.end_date ||= self.start_date + self.trip_length.days  
+    self.start_date ||= Date.today
+    self.trip_length ||= 7
+    self.end_date ||= self.start_date + self.trip_length.days
     self.budget ||= self.trip_length * 200  # ✅ Ensures budget is always set
   end
 end
