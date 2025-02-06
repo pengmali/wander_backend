@@ -10,7 +10,10 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_02_04_091626) do
+ActiveRecord::Schema[8.0].define(version: 2025_02_04_092523) do
+  # These are extensions that must be enabled in order to support this database
+  enable_extension "pg_catalog.plpgsql"
+
   create_table "costs", force: :cascade do |t|
     t.integer "trip_id", null: false
     t.integer "category", default: 4, null: false
@@ -41,11 +44,11 @@ ActiveRecord::Schema[8.0].define(version: 2025_02_04_091626) do
     t.date "start_date", null: false
     t.date "end_date", null: false
     t.integer "trip_length", default: 7, null: false
-    t.decimal "budget", precision: 10, scale: 2
+    t.decimal "budget", precision: 10, scale: 2, default: "1400.0"
     t.decimal "total_cost", precision: 10, scale: 2, default: "0.0"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.boolean "is_guest_trip"
+    t.boolean "is_guest_trip", default: false, null: false
     t.index ["user_id"], name: "index_trips_on_user_id"
   end
 
