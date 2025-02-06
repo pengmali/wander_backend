@@ -14,4 +14,3 @@ class FixTripsTable < ActiveRecord::Migration[8.0]
     change_column_null :trips, :is_guest_trip, false
   end
 end
- 

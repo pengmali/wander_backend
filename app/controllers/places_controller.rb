@@ -5,7 +5,7 @@ class PlacesController < ApplicationController
     if trip
       render json: trip.places
     else
-      render json: { error: 'Trip not found' }, status: :not_found
+      render json: { error: "Trip not found" }, status: :not_found
     end
   end
 
@@ -20,7 +20,7 @@ class PlacesController < ApplicationController
         render json: place.errors, status: :unprocessable_entity
       end
     else
-      render json: { error: 'Trip not found' }, status: :not_found
+      render json: { error: "Trip not found" }, status: :not_found
     end
   end
 
@@ -32,7 +32,7 @@ class PlacesController < ApplicationController
     if place&.update(cost_params)
       render json: { id: place.id, cost: place.cost }
     else
-      render json: place ? place.errors : { error: 'Place not found' }, status: :unprocessable_entity
+      render json: place ? place.errors : { error: "Place not found" }, status: :unprocessable_entity
     end
   end
 
