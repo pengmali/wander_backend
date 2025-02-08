@@ -1,53 +1,52 @@
+# Source for RubyGems
 source "https://rubygems.org"
 
+# Authentication & Security
 gem "bcrypt", "~> 3.1.7"
 
-# Bundle edge Rails instead: gem "rails", github: "rails/rails", branch: "main"
+# Rails Framework
 gem "rails", "~> 8.0.1"
-# Use sqlite3 as the database for Active Record
-# gem "sqlite3", ">= 2.1"
+
+# Database (PostgreSQL)
 gem "pg"
-# Use the Puma web server [https://github.com/puma/puma]
+
+# Web Server
 gem "puma", ">= 5.0"
-# Build JSON APIs with ease [https://github.com/rails/jbuilder]
-# gem "jbuilder"
 
-# Use Active Model has_secure_password [https://guides.rubyonrails.org/active_model_basics.html#securepassword]
-# gem "bcrypt", "~> 3.1.7"
+# Timezone support for Windows
+gem "tzinfo-data", platforms: %i[windows jruby]
 
-# Windows does not include zoneinfo files, so bundle the tzinfo-data gem
-gem "tzinfo-data", platforms: %i[ windows jruby ]
-
-# Use the database-backed adapters for Rails.cache, Active Job, and Action Cable
+# Caching & Queueing
 gem "solid_cache"
 gem "solid_queue"
 gem "solid_cable"
 
-# Reduces boot times through caching; required in config/boot.rb
+# Performance Optimizations
 gem "bootsnap", require: false
 
-# Deploy this application anywhere as a Docker container [https://kamal-deploy.org]
+# Docker Deployment
 gem "kamal", require: false
 
-# Add HTTP asset caching/compression and X-Sendfile acceleration to Puma [https://github.com/basecamp/thruster/]
+# HTTP Caching
 gem "thruster", require: false
 
-# Use Active Storage variants [https://guides.rubyonrails.org/active_storage_overview.html#transforming-images]
-# gem "image_processing", "~> 1.2"
+# Environment Variables
+gem "dotenv-rails", groups: [:development, :test]
 
-# Use Rack CORS for handling Cross-Origin Resource Sharing (CORS), making cross-origin Ajax possible
-# gem "rack-cors"
-# 
-#
-gem 'dotenv-rails', groups: [:development, :test] 
+# ✅ OpenAI API Integration
+gem "ruby-openai", "~> 7.1.0"
 
+# Rails Preloader
+#gem "spring", group: :development
+
+# Development & Testing Tools
 group :development, :test do
-  # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
-  gem "debug", platforms: %i[ mri windows ], require: "debug/prelude"
+  # Debugging
+  gem "debug", platforms: %i[mri windows], require: "debug/prelude"
 
-  # Static analysis for security vulnerabilities [https://brakemanscanner.org/]
+  # Security Analysis
   gem "brakeman", require: false
 
-  # Omakase Ruby styling [https://github.com/rails/rubocop-rails-omakase/]
+  # Ruby Code Style Linting
   gem "rubocop-rails-omakase", require: false
 end

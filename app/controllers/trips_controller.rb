@@ -1,7 +1,12 @@
 class TripsController < ApplicationController
   # ✅ GET /trips - List all trips
   def index
-    trips = Trip.all
+    if params[:user_id]
+      user = User.find_by(id: params[:user_id])
+      trips = user ? user.trips : []
+    else
+      trips = Trip.all  # Optional: Show all trips if not filtered
+    end
     render json: trips
   end
 

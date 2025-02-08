@@ -2,6 +2,9 @@ Rails.application.routes.draw do
 
   # ✅ Global Search Route
   post "/search", to: "search#search"
+
+  post "/login", to: "sessions#create"
+  delete "/logout", to: "sessions#destroy"
   
   resources :users do
     member do
