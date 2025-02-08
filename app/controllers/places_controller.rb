@@ -36,21 +36,6 @@ class PlacesController < ApplicationController
     end
   end
 
-    # ✅ POST /trips/:trip_id/ai_suggestions - Get AI suggestions for places
-    def ai_suggestions
-      trip = Trip.find_by(id: params[:trip_id])
-      return render json: { error: "Trip not found" }, status: :not_found unless trip
-  
-      preferences = params[:preferences]
-      suggestions = AiSuggestionsService.new(trip.destination, preferences).get_suggestions
-  
-      if suggestions
-        render json: suggestions, status: :ok
-      else
-        render json: { error: "Failed to fetch AI suggestions" }, status: :unprocessable_entity
-      end
-    end
-
   private
 
   # ✅ Strong parameters for creating a place

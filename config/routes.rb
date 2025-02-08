@@ -1,4 +1,8 @@
 Rails.application.routes.draw do
+
+  # ✅ Global Search Route
+  post "/search", to: "search#search"
+  
   resources :users do
     member do
       patch "preferences", to: "users#update_preferences"
