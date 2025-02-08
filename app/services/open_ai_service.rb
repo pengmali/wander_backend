@@ -1,3 +1,5 @@
+require 'openai'
+
 class OpenAiService
   OPENAI_API_KEY = ENV['OPENAI_API_KEY']
 
@@ -10,34 +12,29 @@ class OpenAiService
     @client = OpenAI::Client.new(access_token: OPENAI_API_KEY)
   end
 
-  def fetch_suggestions_for_trip
-    full_itinerary = []
-    days_per_request = 2  # Adjust as needed
-    budget_per_request = @budget / (@trip_length.to_f / days_per_request).ceil
-
-    threads = (1..@trip_length).step(days_per_request).map do |start_day|
-      Thread.new do
-        response = fetch_suggestions(start_day, days_per_request, budget_per_request)
-        parsed_response = parse_response(response)
-        full_itinerary.concat(parsed_response) if parsed_response
-      end
-    end
-
-    threads.each(&:join)  # Wait for all threads to finish
-    full_itinerary
-  rescue StandardError => e
-    Rails.logger.error("OpenAI Error: #{e.message}")
-    nil
-  end
-
-  private
-
-  def fetch_suggestions(start_day, days_per_request, budget_per_request, max_tokens: 1500)
+  def fetch_itinerary
     prompt = <<~PROMPT
-      Provide recommendations for #{@destination}, focusing on #{@preferences} preferences,
-      with a strict budget of $#{budget_per_request} for #{days_per_request} days starting from day #{start_day}.
-      Respond ONLY with a valid JSON array of 3 attractions, 2 restaurants, and 1 lodging per day.
-      Ensure the total cost for each period does NOT exceed $#{budget_per_request}.
+      You are a travel assistant. Create a list of:
+      - #{3 * @trip_length} attractions
+      - #{2 * @trip_length} restaurants
+      - #{(@trip_length / 3.0).ceil} lodging options (preferably one lodging for every 3 days)
+
+      1. Destination: #{@destination}, Trip Start Date: #{@start_date}, Duration: #{@trip_length} days.
+      2. Budget: $#{@budget} for the entire trip. Allocate the budget as follows:
+      - 40% for accommodations (lodging)
+      - 30% for food (restaurants)
+      - 30% for activities (attractions)
+      Ensure the costs for each category do not exceed the allocated budget. If needed, adjust the prices to fit within these limits.
+
+      3. Preferences: #{@preferences.join(', ')}.
+
+
+      Format:
+      {
+        "attractions": [{ "name": "Name", "description": "Description", "cost": 50, "rating": 4.5, "category": "attraction", "google_link": "https://www.google.com/maps/search/?api=1&query=Name" }],
+        "restaurants": [{ "name": "Name", "description": "Description", "cost": 30, "rating": 4.0, "category": "restaurant", "google_link": "https://www.google.com/maps/search/?api=1&query=Name" }],
+        "lodging": [{ "name": "Hotel Name", "description": "Description", "cost": 150, "rating": 4.7, "category": "lodging", "google_link": "https://www.google.com/maps/search/?api=1&query=Hotel+Name" }]
+      }
     PROMPT
 
     response = @client.chat(
@@ -47,13 +44,18 @@ class OpenAiService
           { role: "system", content: "You are a helpful travel assistant." },
           { role: "user", content: prompt }
         ],
-        max_tokens: max_tokens,
+        max_tokens: 2000,
         temperature: 0.7
       }
     )
 
-    response.dig("choices", 0, "message", "content")&.strip
+    parse_response(response.dig("choices", 0, "message", "content"))
+  rescue StandardError => e
+    Rails.logger.error("OpenAI Error: #{e.message}")
+    nil 
   end
+
+  private
 
   def parse_response(response)
     JSON.parse(response)

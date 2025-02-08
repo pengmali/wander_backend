@@ -1,5 +1,3 @@
-require 'openai'
-
 class SearchController < ApplicationController
   TRAVEL_STYLE_MAP = {
     "solo" => :solo,
@@ -30,22 +28,22 @@ class SearchController < ApplicationController
 
     cache_key = "search_#{destination}_#{budget}_#{start_date}_#{trip_length}_#{travel_styles.sort.join("_")}".parameterize
 
-    # ✅ Read from cache
     cached_result = Rails.cache.read(cache_key)
     if cached_result
       Rails.logger.info("Cache hit for key: #{cache_key}")
       return render json: cached_result, status: :ok
     end
 
-    # 🚀 Fetch AI suggestions if not cached
-    ai_response = AiSuggestionsService.new(destination, budget, start_date, trip_length, travel_styles).get_suggestions
+    itinerary_service = AiSuggestionsService.new(destination, budget, start_date, trip_length, travel_styles)
+    itinerary = itinerary_service.get_itinerary
+    #total_cost = itinerary_service.calculate_total_cost(itinerary) # ✅ Calculate total cost
 
-    # ✅ Write to cache (cache expires in 12 hours, adjust as needed)
-    Rails.cache.write(cache_key, ai_response, expires_in: 12.hours)
+    response = { itinerary: itinerary } 
 
-    Rails.logger.info("RAW AI RESPONSE: #{ai_response}") # Logs the raw response
+    Rails.cache.write(cache_key, response, expires_in: 12.hours) # ✅ Cache the response
+    Rails.logger.info("New search cached for key: #{cache_key}")
 
-    render json: { raw_ai_response: ai_response }, status: :ok
+    render json: response, status: :ok
   rescue StandardError => e
     Rails.logger.error("Search Error: #{e.message}")
     render json: { error: "Search failed" }, status: :unprocessable_entity
