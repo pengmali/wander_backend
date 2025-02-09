@@ -1,79 +1,57 @@
 class UsersController < ApplicationController
-  # ✅ POST /users - Register a new user
+  def index
+    users = User.all
+    render json: users
+  end
+
+  def show
+    user = User.find(params[:id])
+    render json: user
+  end
+
   def create
     user = User.new(user_params)
     if user.save
-      render json: { message: "User created successfully", user: user }, status: :created
+      render json: user, status: :created
     else
-      render json: user.errors, status: :unprocessable_entity
+      render json: { error: user.errors.full_messages }, status: :unprocessable_entity
     end
   end
 
-  # ✅ GET /users/:id - Retrieve user details
-  def show
-    user = User.find_by(id: params[:id])
-    if user
-      render json: user
-    else
-      render json: { error: "User not found" }, status: :not_found
-    end
-  end
+ 
 
-  # ✅ PATCH /users/:id/preferences - Update user preferences
-  def update_preferences
-    user = User.find_by(id: params[:id])
-    if user&.update(preferences_params)
-      render json: { message: "Preferences updated successfully", preferences: user.travel_style }
-    else
-      render json: user ? user.errors : { error: "User not found" }, status: :unprocessable_entity
-    end
-  end
-
-  # ✅ GET /users/:id/itineraries - List saved itineraries
-  def itineraries
-    user = User.find_by(id: params[:id])
-    if user
-      render json: user.trips
-    else
-      render json: { error: "User not found" }, status: :not_found
-    end
-  end
-
-  # ✅ POST /users/:id/itineraries - Save an itinerary
   def save_itinerary
-    user = User.find_by(id: params[:id])
-    trip = Trip.find_by(id: params[:trip_id])
+    user = User.find(params[:id])
+    trip_params_with_default_name = trip_params
+    trip_params_with_default_name[:name] ||= "Trip to #{trip_params[:destination]} on #{trip_params[:start_date]}"
 
-    if user && trip
-      user.trips << trip unless user.trips.include?(trip)
-      render json: { message: "Itinerary saved successfully", trip: trip }
+    trip = Trip.new(trip_params_with_default_name)
+    trip.user = user
+
+    Rails.logger.debug("Trip Save Status: #{trip.save}")
+    Rails.logger.debug("Trip Errors: #{trip.errors.full_messages}") unless trip.persisted?
+
+    if trip.save
+      render json: { message: 'Itinerary saved successfully', trip: trip }, status: :created
     else
-      render json: { error: "User or Trip not found" }, status: :not_found
+      render json: { error: trip.errors.full_messages }, status: :unprocessable_entity
     end
   end
 
-  # ✅ DELETE /users/:id/itineraries/:itinerary_id - Remove a saved itinerary
-  def remove_itinerary
-    user = User.find_by(id: params[:id])
-    trip = user&.trips&.find_by(id: params[:itinerary_id])
-
-    if trip
-      user.trips.delete(trip)
-      render json: { message: "Itinerary removed successfully" }
-    else
-      render json: { error: "Itinerary not found" }, status: :not_found
-    end
+  def itineraries
+    user = User.find(params[:id])
+    trips = user.trips
+  
+    render json: trips, status: :ok
   end
 
   private
 
-  # ✅ Strong parameters for user creation
   def user_params
-    params.require(:user).permit(:name, :email, :password, :password_confirmation, :travel_style)
+    params.require(:user).permit(:name, :email, :password)
   end
 
-  # ✅ Strong parameters for updating preferences
-  def preferences_params
-    params.require(:user).permit(:travel_style)
+  def trip_params
+    params.require(:trip).permit(:name, :destination, :start_date, :end_date, :budget, itinerary: [:day, attractions: [:name, :description, :cost, :category, :google_link], restaurants: [:name, :description, :cost, :category, :google_link], lodging: [:name, :description, :cost, :category, :google_link]])
   end
 end

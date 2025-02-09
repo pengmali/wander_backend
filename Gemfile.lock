@@ -93,11 +93,23 @@ GEM
       irb (~> 1.10)
       reline (>= 0.3.8)
     dotenv (3.1.7)
+    dotenv-rails (3.1.7)
+      dotenv (= 3.1.7)
+      railties (>= 6.1)
     drb (2.2.1)
     ed25519 (1.3.0)
     erubi (1.13.1)
     et-orbi (1.2.11)
       tzinfo
+    event_stream_parser (1.0.0)
+    faraday (2.12.2)
+      faraday-net_http (>= 2.0, < 3.5)
+      json
+      logger
+    faraday-multipart (1.1.0)
+      multipart-post (~> 2.0)
+    faraday-net_http (3.4.0)
+      net-http (>= 0.5.0)
     fugit (1.11.1)
       et-orbi (~> 1, >= 1.2.11)
       raabro (~> 1.4)
@@ -136,6 +148,9 @@ GEM
     mini_mime (1.1.5)
     minitest (5.25.4)
     msgpack (1.7.5)
+    multipart-post (2.4.1)
+    net-http (0.6.0)
+      uri
     net-imap (0.5.5)
       date
       net-protocol
@@ -255,6 +270,10 @@ GEM
       rubocop-minitest
       rubocop-performance
       rubocop-rails
+    ruby-openai (7.1.0)
+      event_stream_parser (>= 0.3.0, < 2.0.0)
+      faraday (>= 1)
+      faraday-multipart (>= 1)
     ruby-progressbar (1.13.0)
     securerandom (0.4.1)
     solid_cable (3.0.7)
@@ -317,11 +336,13 @@ DEPENDENCIES
   bootsnap
   brakeman
   debug
+  dotenv-rails
   kamal
   pg
   puma (>= 5.0)
   rails (~> 8.0.1)
   rubocop-rails-omakase
+  ruby-openai (~> 7.1.0)
   solid_cable
   solid_cache
   solid_queue
