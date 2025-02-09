@@ -38,6 +38,8 @@ gem "ruby-openai", "~> 7.1.0"
 
 # Rails Preloader
 #gem "spring", group: :development
+#
+gem 'rack-cors'
 
 # Development & Testing Tools
 group :development, :test do
