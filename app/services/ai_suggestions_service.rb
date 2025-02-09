@@ -5,13 +5,29 @@ class AiSuggestionsService
     @start_date = start_date
     @trip_length = trip_length
     @travel_styles = travel_styles
+    @open_ai_service = OpenAiService.new(@destination, @budget, @start_date, @trip_length, @travel_styles)
   end
 
   def get_itinerary
-    data = OpenAiService.new(@destination, @budget, @start_date, @trip_length, @travel_styles).fetch_itinerary
+    data = @open_ai_service.fetch_itinerary
     return [] unless data
 
     organize_itinerary(data)
+  end
+
+  def get_more_attractions(count = 10)
+    data = @open_ai_service.fetch_more_attractions(count)
+    data['attractions'] || []
+  end
+
+  def get_more_restaurants(count = 10)
+    data = @open_ai_service.fetch_more_restaurants(count)
+    data['restaurants'] || []
+  end
+
+  def get_more_lodging(count = 5)
+    data = @open_ai_service.fetch_more_lodging(count)
+    data['lodging'] || []
   end
 
   private
@@ -33,10 +49,4 @@ class AiSuggestionsService
 
     itinerary
   end
-
-  # def extract_cost(item)
-  #   return 0 if item.nil?
-  #   cost = item['cost'] || item['price'] || "0"
-  #   cost.to_s.scan(/\d+/).join.to_i
-  # end
 end

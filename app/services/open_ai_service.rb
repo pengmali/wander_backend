@@ -13,21 +13,42 @@ class OpenAiService
   end
 
   def fetch_itinerary
-    prompt = <<~PROMPT
+    prompt = generate_prompt(3 * @trip_length, 2 * @trip_length, (@trip_length / 3.0).ceil)
+    fetch_from_openai(prompt)
+  end
+
+  def fetch_more_attractions(count = 10)
+    prompt = generate_simple_prompt(count, "attractions")
+    fetch_from_openai(prompt)
+  end
+
+  def fetch_more_restaurants(count = 10)
+    prompt = generate_simple_prompt(count, "restaurants")
+    fetch_from_openai(prompt)
+  end
+
+  def fetch_more_lodging(count = 5)
+    prompt = generate_simple_prompt(count, "lodging")
+    fetch_from_openai(prompt)
+  end
+
+  private
+
+  def generate_prompt(attractions_count, restaurants_count, lodging_count)
+    <<~PROMPT
       You are a travel assistant. Create a list of:
-      - #{3 * @trip_length} attractions
-      - #{2 * @trip_length} restaurants
-      - #{(@trip_length / 3.0).ceil} lodging options (preferably one lodging for every 3 days)
+      - #{attractions_count} attractions
+      - #{restaurants_count} restaurants
+      - #{lodging_count} lodging options (preferably one lodging for every 3 days)
 
       1. Destination: #{@destination}, Trip Start Date: #{@start_date}, Duration: #{@trip_length} days.
       2. Budget: $#{@budget} for the entire trip. Allocate the budget as follows:
       - 40% for accommodations (lodging)
       - 30% for food (restaurants)
       - 30% for activities (attractions)
-      Ensure the costs for each category do not exceed the allocated budget. If needed, adjust the prices to fit within these limits.
+      Ensure the costs for each category do not exceed the allocated budget.
 
       3. Preferences: #{@preferences.join(', ')}.
-
 
       Format:
       {
@@ -36,7 +57,20 @@ class OpenAiService
         "lodging": [{ "name": "Hotel Name", "description": "Description", "cost": 150, "rating": 4.7, "category": "lodging", "google_link": "https://www.google.com/maps/search/?api=1&query=Hotel+Name" }]
       }
     PROMPT
+  end
 
+  def generate_simple_prompt(count, type)
+    <<~PROMPT
+      You are a travel assistant. Provide #{count} #{type} options for the destination: #{@destination}.
+
+      Format:
+      {
+        "#{type}": [{ "name": "Name", "description": "Description", "cost": 50, "rating": 4.5, "category": "#{type}", "google_link": "https://www.google.com/maps/search/?api=1&query=Name" }]
+      }
+    PROMPT
+  end
+
+  def fetch_from_openai(prompt)
     response = @client.chat(
       parameters: {
         model: "gpt-4",
@@ -52,10 +86,8 @@ class OpenAiService
     parse_response(response.dig("choices", 0, "message", "content"))
   rescue StandardError => e
     Rails.logger.error("OpenAI Error: #{e.message}")
-    nil 
+    nil
   end
-
-  private
 
   def parse_response(response)
     JSON.parse(response)
