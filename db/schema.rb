@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_02_08_190713) do
+ActiveRecord::Schema[8.0].define(version: 2025_02_08_234311) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -21,21 +21,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_02_08_190713) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["trip_id"], name: "index_costs_on_trip_id"
-  end
-
-  create_table "places", force: :cascade do |t|
-    t.integer "trip_id", null: false
-    t.string "name", null: false
-    t.string "category", null: false
-    t.string "formatted_address", null: false
-    t.float "latitude"
-    t.float "longitude"
-    t.decimal "cost", precision: 10, scale: 2, default: "0.0"
-    t.float "rating"
-    t.integer "duration"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["trip_id"], name: "index_places_on_trip_id"
   end
 
   create_table "trips", force: :cascade do |t|
@@ -50,6 +35,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_02_08_190713) do
     t.datetime "updated_at", null: false
     t.boolean "is_guest_trip", default: false, null: false
     t.string "destination"
+    t.jsonb "itinerary"
     t.index ["user_id"], name: "index_trips_on_user_id"
   end
 
@@ -63,6 +49,5 @@ ActiveRecord::Schema[8.0].define(version: 2025_02_08_190713) do
   end
 
   add_foreign_key "costs", "trips"
-  add_foreign_key "places", "trips"
   add_foreign_key "trips", "users"
 end
