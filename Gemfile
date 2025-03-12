@@ -5,7 +5,7 @@ source "https://rubygems.org"
 gem "bcrypt", "~> 3.1.7"
 
 # Rails Framework
-gem "rails", "~> 8.0.1"
+gem "rails", "~> 8.0.2"
 
 # Database (PostgreSQL)
 gem "pg"
