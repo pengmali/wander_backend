@@ -34,7 +34,7 @@ gem "thruster", require: false
 gem "dotenv-rails", groups: [:development, :test]
 
 # ✅ OpenAI API Integration
-gem "ruby-openai", "~> 7.1.0"
+gem "ruby-openai", "~> 8.1.0"
 
 # Rails Preloader
 #gem "spring", group: :development
